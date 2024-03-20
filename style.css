@@ -1,0 +1,24 @@
+html,
+body {
+  height: 100%;
+}
+h1{
+  
+  font-size: 2em;
+  font-family: Courier;
+  font-weight: bold;
+  text-align: center;
+}
+body {
+  display: flex;
+  margin: 0;
+  /* This centers our sketch horizontally. */
+  justify-content: center;
+
+  /* This centers our sketch vertically. */
+  align-items: center;
+}
+
+
+
+
