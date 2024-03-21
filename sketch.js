@@ -13,7 +13,7 @@ let title;
 let numWall = 20;
 let numWave = 0;
 let difficulty = 1;
-let state = 0; //0-> landing page, 1-> game
+let state = 0; //0-> landing page, 1-> game, 2-> pause screen
 let buildwall, downlife, backsound, gameover, killcritter;
 let towerX = [];
 let towerY = [];
@@ -23,6 +23,7 @@ let arrowXVel = 0.8;
 let arrowYVel = [];
 let yVel = [-1.2, -1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
 let addTower = false;
+let pause = false
 
 function preload() {
   soundFormats("wav", "ogg");
@@ -148,7 +149,7 @@ function draw() {
         life--;
       }
       //detection collision
-      if (wallX.length != 0) {
+      if (wallX.length != 0 && x.length != 0) {
         for (let j = 0; j < wallX.length; j++) {
           if (dist(x[i], y[i], wallX[j], wallY[j]) < 12) {
             killcritter.play();
@@ -272,6 +273,13 @@ function draw() {
     text("life: " + str(life), width - 20, 40);
     text("number of walls: " + str(numWall), width - 20, height - 20);
   }
+  else if(state == 2){  //pause screen
+      textAlign(CENTER);
+      textSize(100);
+      fill("#E91E63");
+      text("Pause", width / 2, height / 2);
+    
+  }
 }
 
 function mousePressed() {
@@ -287,6 +295,15 @@ function mousePressed() {
     wallY.push(mouseY);
     buildwall.play();
     numWall--;
+  }
+}
+
+function keyPressed(){
+  if(key == ' ' && state == 1){
+    state = 2
+  }
+  else if(key == ' ' && state == 2){
+    state = 1
   }
 }
 
