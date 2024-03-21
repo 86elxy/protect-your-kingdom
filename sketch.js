@@ -85,22 +85,37 @@ function draw() {
 
   if (state == 0) {
     //landing page
+    push()
+    translate(10+65, height / 2);
+    rotate(90);
+    textFont('courier')
+    textAlign(CENTER)
+    textSize(50)
+    fill('white')
+    text("Protect your",0,0)
+    pop()
+    
     textAlign(LEFT);
-    fill(20);
-    textSize(30);
     textFont("Micro 5");
-    text("- click to place wall to block critter", width / 4, height / 2 - 30);
-    text("- you gain one wall in light green region", width / 4, height / 2);
+    fill(20);
+    textSize(50)
+    text("Instructions", width / 4, height / 2 - 30 - 30-30);
+    textSize(30);
+    fill(40)
+    text("- click to place wall to block critter", width / 4, height / 2 - 30 - 30);
+    text("- you gain one wall in light green region", width / 4, height / 2 - 30);
+    text("- you gain 50% more walls in the kingdom", width / 4, height / 2);
     text(
-      "- you gain 50% more walls in the kingdom",
+      "- turrets will appear after wave 5",
       width / 4,
       height / 2 + 30
     );
     text(
-      "- turrets will appear after wave 5",
+      "- complete 30 waves to win!",
       width / 4,
       height / 2 + 30 + 30
     );
+    text('- hit spacebar to pause game', width/4,height/2+30+30+30)
   } else if (state == 1) {
     //game
 
