@@ -11,7 +11,7 @@ const wallSize = 15;
 let btn1, btn2, btn3, btn4;
 let title;
 let numWall = 20;
-let numWave = 10;
+let numWave = 0;
 let difficulty = 1;
 let state = 0; //0-> landing page, 1-> game, 2-> pause screen
 let buildwall, downlife, backsound, gameover, killcritter;
