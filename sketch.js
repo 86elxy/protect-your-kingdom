@@ -11,7 +11,7 @@ const wallSize = 15;
 let btn1, btn2, btn3, btn4;
 let title;
 let numWall = 20;
-let numWave = 0;
+let numWave = 10;
 let difficulty = 1;
 let state = 0; //0-> landing page, 1-> game, 2-> pause screen
 let buildwall, downlife, backsound, gameover, killcritter;
@@ -119,9 +119,17 @@ function draw() {
     );
     text("- you gain 50% more walls in the kingdom", width / 4, height / 2);
     text("- arrow towers will appear after wave 5", width / 4, height / 2 + 30);
-    text("- fireballs will appear after wave 10", width / 4, height / 2 + 30+30);
-    text("- complete 30 waves to win!", width / 4, height / 2 + 30 + 30+30);
-    text("- hit spacebar to pause game", width / 4, height / 2 + 30 + 30 + 30+30);
+    text(
+      "- fireballs will appear after wave 10",
+      width / 4,
+      height / 2 + 30 + 30
+    );
+    text("- complete 30 waves to win!", width / 4, height / 2 + 30 + 30 + 30);
+    text(
+      "- hit spacebar to pause game",
+      width / 4,
+      height / 2 + 30 + 30 + 30 + 30
+    );
   } else if (state == 1) {
     //game
 
@@ -227,8 +235,8 @@ function draw() {
           ballX.splice(i, 1);
           ballY.splice(i, 1);
           ballLife.splice(i, 1);
-          life+=0.2
-          killed+=10
+          life += 0.2;
+          killed += 10;
         }
       }
     }
@@ -354,25 +362,38 @@ function draw() {
 
 function mousePressed() {
   if (numWall > 0.5 && state == 1) {
-    for (let i = ballX.length - 1; i >= 0; i--) {
-      if (
-        dist(mouseX, mouseY, ballX[i], ballY[i]) <
-        (ballLife[i] * 8 + 20) / 2
-      ) {
-        ballLife[i]--;
-        numWall+=0.5
-      } else if (
-        mouseX > 0 &&
-        mouseX < width &&
-        mouseY > 0 &&
-        mouseY < height
-      ) {
-        wallX.push(mouseX);
-        wallY.push(mouseY);
-        buildwall.play();
-        numWall--;
+    if (ballX.length >= 1) {
+      for (let i = ballX.length - 1; i >= 0; i--) {
+        if (
+          dist(mouseX, mouseY, ballX[i], ballY[i]) <
+          (ballLife[i] * 8 + 20) / 2
+        ) {
+          ballLife[i]--;
+          numWall += 0.5;
+        } else if (
+          mouseX > 0 &&
+          mouseX < width &&
+          mouseY > 0 &&
+          mouseY < height
+        ) {
+          wallX.push(mouseX);
+          wallY.push(mouseY);
+          buildwall.play();
+          numWall--;
+        }
       }
     }
+    else if (
+          mouseX > 0 &&
+          mouseX < width &&
+          mouseY > 0 &&
+          mouseY < height
+        ) {
+          wallX.push(mouseX);
+          wallY.push(mouseY);
+          buildwall.play();
+          numWall--;
+        }
   }
 }
 
