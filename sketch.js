@@ -220,6 +220,14 @@ function draw() {
         //update fireball movement
         ballX[i] -= ballLife[i] / ballXVel;
 
+        //check for fireball crossing the line
+        if(ballX[i]<=0){
+          ballX.splice(i, 1);
+          ballY.splice(i, 1);
+          ballLife.splice(i, 1);
+          life--
+        }
+        
         //detect collision between fireball and wall
         for (let j = wallX.length - 1; j >= 0; j--) {
           if (
