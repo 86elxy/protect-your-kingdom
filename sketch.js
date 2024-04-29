@@ -8,7 +8,7 @@ let life = 20;
 let wallX = [];
 let wallY = [];
 const wallSize = 15;
-let btn1, btn2, btn3,btn4
+let btn1, btn2, btn3, btn4;
 let title;
 let numWall = 20;
 let numWave = 0;
@@ -23,7 +23,12 @@ let arrowXVel = 0.8;
 let arrowYVel = [];
 let yVel = [-1.2, -1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.2];
 let addTower = false;
-let pause = false
+let pause = false;
+let ballXVel = 20;
+let ballX = [];
+let ballY = [];
+let ballLife = [];
+let killed = 0;
 
 function preload() {
   soundFormats("wav", "ogg");
@@ -35,7 +40,7 @@ function preload() {
 }
 
 function setup() {
-  angleMode(DEGREES)
+  angleMode(DEGREES);
   //title = createElement('h1','Protect your Kingdom')
   //title.style('color','deeppink')
   createCanvas(600, 400);
@@ -54,11 +59,11 @@ function setup() {
   btn3.mousePressed(playAgain);
   btn3.position(windowWidth / 2 - 30, (windowHeight * 9) / 10);
   btn3.hide();
-  
-  btn4 = createButton('trade 100 wall for 1 life')
-  btn4.mousePressed(trade)
-  btn4.position(windowWidth / 2 + 100, (windowHeight*9)/10)
-  btn4.hide()
+
+  btn4 = createButton("trade 100 wall for 1 life");
+  btn4.mousePressed(trade);
+  btn4.position(windowWidth / 2 + 100, (windowHeight * 9) / 10);
+  btn4.hide();
   //play background sound
   //backsound.loop();
 }
@@ -85,37 +90,38 @@ function draw() {
 
   if (state == 0) {
     //landing page
-    push()
-    translate(10+65, height / 2);
+    push();
+    translate(10 + 65, height / 2);
     rotate(90);
-    textFont('courier')
-    textAlign(CENTER)
-    textSize(50)
-    fill('white')
-    text("Protect your",0,0)
-    pop()
-    
+    textFont("courier");
+    textAlign(CENTER);
+    textSize(50);
+    fill("white");
+    text("Protect your", 0, 0);
+    pop();
+
     textAlign(LEFT);
     textFont("Micro 5");
     fill(20);
-    textSize(50)
-    text("Instructions", width / 4, height / 2 - 30 - 30-30);
+    textSize(50);
+    text("Instructions", width / 4, height / 2 - 30 - 30 - 30);
     textSize(30);
-    fill(40)
-    text("- click to place wall to block critter", width / 4, height / 2 - 30 - 30);
-    text("- you gain one wall in light green region", width / 4, height / 2 - 30);
+    fill(40);
+    text(
+      "- click to place wall to block critter",
+      width / 4,
+      height / 2 - 30 - 30
+    );
+    text(
+      "- you gain one wall in light green region",
+      width / 4,
+      height / 2 - 30
+    );
     text("- you gain 50% more walls in the kingdom", width / 4, height / 2);
-    text(
-      "- turrets will appear after wave 5",
-      width / 4,
-      height / 2 + 30
-    );
-    text(
-      "- complete 30 waves to win!",
-      width / 4,
-      height / 2 + 30 + 30
-    );
-    text('- hit spacebar to pause game', width/4,height/2+30+30+30)
+    text("- arrow towers will appear after wave 5", width / 4, height / 2 + 30);
+    text("- fireballs will appear after wave 10", width / 4, height / 2 + 30+30);
+    text("- complete 30 waves to win!", width / 4, height / 2 + 30 + 30+30);
+    text("- hit spacebar to pause game", width / 4, height / 2 + 30 + 30 + 30+30);
   } else if (state == 1) {
     //game
 
@@ -165,9 +171,10 @@ function draw() {
       }
       //detection collision
       if (wallX.length != 0 && x.length != 0) {
-        for (let j = 0; j < wallX.length; j++) {
+        for (let j = wallX.length - 1; j >= 0; j--) {
           if (dist(x[i], y[i], wallX[j], wallY[j]) < 12) {
             killcritter.play();
+            killed++;
             x.splice(i, 1);
             y.splice(i, 1);
             critterXVel.splice(i, 1);
@@ -179,6 +186,49 @@ function draw() {
               numWall++;
             }
           }
+        }
+      }
+    }
+
+    //generate fireballs
+    if (numWave >= 10 && frameCount % 500 == 0) {
+      ballX.push(width + floor(random(80, 180)));
+      ballY.push(floor(random(50, height - 80)));
+      ballLife.push(floor(random(10, 20)));
+    }
+
+    //display fireballs
+    if (ballX.length != 0) {
+      for (let i = ballX.length - 1; i >= 0; i--) {
+        push();
+        fill("orange");
+        ellipse(ballX[i], ballY[i], ballLife[i] * 8 + 20, ballLife[i] * 8 + 20);
+        textAlign(CENTER);
+        textSize(25);
+        fill(0);
+        text(ballLife[i], ballX[i], ballY[i] + 10);
+        pop();
+
+        //update fireball movement
+        ballX[i] -= ballLife[i] / ballXVel;
+
+        //detect collision between fireball and wall
+        for (let j = wallX.length - 1; j >= 0; j--) {
+          if (
+            dist(wallX[j], wallY[j], ballX[i], ballY[i]) <=
+            (ballLife[i] * 8) / 2 + wallSize / 2
+          ) {
+            wallX.splice(j, 1);
+            wallY.splice(j, 1);
+            ballLife[i]--;
+          }
+        }
+        if (ballLife[i] <= 0) {
+          ballX.splice(i, 1);
+          ballY.splice(i, 1);
+          ballLife.splice(i, 1);
+          life+=0.2
+          killed+=10
         }
       }
     }
@@ -201,7 +251,11 @@ function draw() {
     }
 
     //generate arrow
-    if (towerX.length != 0 && frameCount % (80-numWave) == 0 && arrowX.length < 50) {
+    if (
+      towerX.length != 0 &&
+      frameCount % (80 - numWave) == 0 &&
+      arrowX.length < 50
+    ) {
       chosen = floor(random(0, towerX.length));
       arrowX.push(towerX[chosen]);
       arrowY.push(towerY[chosen]);
@@ -213,7 +267,7 @@ function draw() {
       for (let i = 0; i < arrowX.length; i++) {
         push();
         fill("red");
-        ellipse(arrowX[i], arrowY[i], critterSize / 2, critterSize / 2);
+        ellipse(arrowX[i], arrowY[i], critterSize / 1.5, critterSize / 4);
         pop();
 
         //update arrow movement
@@ -225,7 +279,7 @@ function draw() {
           arrowYVel[i] *= -1;
         }
         //detect arrow collide with wall
-        for (let j = 0; j < wallX.length; j++) {
+        for (let j = wallX.length - 1; j >= 0; j--) {
           if (dist(arrowX[i], arrowY[i], wallX[j], wallY[j]) < 7) {
             killcritter.play();
             arrowX.splice(i, 1);
@@ -234,9 +288,9 @@ function draw() {
             wallX.splice(j, 1);
             wallY.splice(j, 1);
             if (wallX[j] > width / 5) {
-              numWall += 1.5;
+              numWall += 1.25;
             } else {
-              numWall+=0.5;
+              numWall += 0.75;
             }
           }
         }
@@ -250,22 +304,22 @@ function draw() {
       }
     }
 
-    if(numWave == 30 && x.length == 0){
-      btn2.hide()
-      btn3.show()
-      noLoop()
+    if (numWave == 30 && x.length == 0) {
+      btn2.hide();
+      btn3.show();
+      noLoop();
       textAlign(CENTER);
       textSize(100);
       fill("#E91E63");
       text("You Win !", width / 2, height / 2);
     }
-    
+
     //check for game over
     if (life <= 0) {
       backsound.pause();
       gameover.play();
       btn1.hide();
-      btn4.hide()
+      btn4.hide();
       btn3.show();
       noLoop();
       textAlign(CENTER);
@@ -274,51 +328,59 @@ function draw() {
       text("Game Over", width / 2, height / 2);
       textSize(60);
       text(
-        "You cleared " + str(numWave - 1) + " waves!",
+        "You did not clear wave " + str(numWave) + " !",
         width / 2,
         height / 2 + 70
       );
     }
 
-    //display life and number of walls
+    //display life, wave number, killed and number of walls
     textSize(30);
     textAlign(RIGHT);
     fill(20);
     textFont("Micro 5");
     text("life: " + str(life), width - 20, 40);
+    text("killed: " + str(killed), width - 20, 40 + 30);
+    text("wave number " + str(numWave), width - 20, 40 + 30 + 30);
     text("number of walls: " + str(numWall), width - 20, height - 20);
-  }
-  else if(state == 2){  //pause screen
-      textAlign(CENTER);
-      textSize(100);
-      fill("#E91E63");
-      text("Pause", width / 2, height / 2);
-    
+  } else if (state == 2) {
+    //pause screen
+    textAlign(CENTER);
+    textSize(100);
+    fill("#E91E63");
+    text("Pause", width / 2, height / 2);
   }
 }
 
 function mousePressed() {
-  if (
-    numWall > 0.5 &&
-    mouseX > 0 &&
-    mouseX < width &&
-    mouseY > 0 &&
-    mouseY < height &&
-    state == 1
-  ) {
-    wallX.push(mouseX);
-    wallY.push(mouseY);
-    buildwall.play();
-    numWall--;
+  if (numWall > 0.5 && state == 1) {
+    for (let i = ballX.length - 1; i >= 0; i--) {
+      if (
+        dist(mouseX, mouseY, ballX[i], ballY[i]) <
+        (ballLife[i] * 8 + 20) / 2
+      ) {
+        ballLife[i]--;
+        numWall+=0.5
+      } else if (
+        mouseX > 0 &&
+        mouseX < width &&
+        mouseY > 0 &&
+        mouseY < height
+      ) {
+        wallX.push(mouseX);
+        wallY.push(mouseY);
+        buildwall.play();
+        numWall--;
+      }
+    }
   }
 }
 
-function keyPressed(){
-  if(key == ' ' && state == 1){
-    state = 2
-  }
-  else if(key == ' ' && state == 2){
-    state = 1
+function keyPressed() {
+  if (key == " " && state == 1) {
+    state = 2;
+  } else if (key == " " && state == 2) {
+    state = 1;
   }
 }
 
@@ -326,7 +388,7 @@ function startGame() {
   state = 1;
   btn2.hide();
   btn1.show();
-  btn4.show()
+  btn4.show();
 }
 
 function startWave() {
@@ -344,16 +406,16 @@ function startWave() {
   }
 }
 
-function trade(){
-  if(numWall >= 100){
-    numWall -= 100
-    life++
+function trade() {
+  if (numWall >= 100) {
+    numWall -= 100;
+    life++;
   }
 }
 
 function playAgain() {
-  
   state = 0;
+  killed = 0;
   life = 20;
   numWall = 20;
   difficulty = 1;
@@ -363,11 +425,14 @@ function playAgain() {
   critterXVel = [];
   wallX = [];
   wallY = [];
-  arrowX = []
-  arrowY = []
-  arrowYVel = []
-  towerX = []
-  towerY = []
+  arrowX = [];
+  arrowY = [];
+  arrowYVel = [];
+  towerX = [];
+  towerY = [];
+  ballX = [];
+  balllY = [];
+  ballLife = [];
   btn3.hide();
   btn2.show();
   loop();
